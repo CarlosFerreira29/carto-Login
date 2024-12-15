@@ -1,0 +1,449 @@
+<html><head><base href="." />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema de Login e Cadastro</title>
+<style>
+/* Mantendo o mesmo CSS */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: white;
+    padding: 3rem; /* Updated padding */
+    border-radius: 12px; /* Increased border radius */
+    box-shadow: 0 0 25px rgba(0,0,0,0.25); /* Updated shadow */
+    width: 100%;
+    max-width: 500px; /* Increased from 450px */
+}
+
+.logo-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.logo-container img {
+    width: 250px; /* Increased from 200px */
+    height: auto;
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+.form-group {
+    margin-bottom: 2rem; /* Increased spacing between form groups */
+}
+
+label {
+    display: block;
+    margin-bottom: 0.7rem; /* Increased margin */
+    color: #333;
+    font-size: 1.2rem; /* Updated font size */
+    font-weight: 500;
+}
+
+input {
+    width: 100%;
+    padding: 1rem; /* Increased padding */
+    border: 1.5px solid #ddd; /* Updated border width */
+    border-radius: 6px; /* Updated border radius */
+    box-sizing: border-box;
+    font-size: 17px; /* Slightly larger font */
+    margin-bottom: 20px; /* Increased margin */
+}
+
+button {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem; /* Increased padding */
+    border-radius: 6px; /* Updated border radius */
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1.5rem; /* Increased margin */
+    font-size: 16px; /* Updated font size */
+    font-weight: 500; /* Updated font weight */
+}
+
+button:hover {
+    background: #1e3c72;
+}
+
+.hidden {
+    display: none;
+}
+
+.link-style {
+    background: none;
+    border: none;
+    color: #2a5298;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+    margin-top: 1rem;
+    width: auto;
+}
+
+.link-style:hover {
+    background: none;
+    color: #1e3c72;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #2a5298;
+    color: white;
+}
+
+.user-table {
+    margin-top: 2rem;
+}
+
+#successMessage {
+    color: green;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+#errorMessage {
+    color: red;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.password-column {
+    font-style: italic;
+    color: #666;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="logo-container">
+        <img src="/1000176594-removebg-preview.png" alt="CaroFala Logo" style="width: 250px; height: auto; display: block; margin: 0 auto 20px auto;">
+        <h3 style="text-align: center; color: #333; margin-bottom: 35px;">Acessar sistema de Gestão de Produção do Setor CPL</h3>
+    </div>
+    <div id="loginForm">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="loginUsername">Usuário:</label>
+            <input type="text" id="loginUsername" required>
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">Senha:</label>
+            <input type="password" id="loginPassword" required>
+        </div>
+        <button onclick="handleLogin()">Entrar</button>
+        <button class="link-style" onclick="promptAdminPassword()">Cadastrar Novo  Usuário</button>
+    </div>
+
+    <div id="registerForm" class="hidden">
+        <h2>Cadastro de Usuário</h2>
+        <div class="form-group">
+            <label for="newUsername">Novo Usuário:</label>
+            <input type="text" id="newUsername" required>
+        </div>
+        <div class="form-group">
+            <label for="newPassword">Nova Senha:</label>
+            <input type="password" id="newPassword" required>
+        </div>
+        <button onclick="handleRegister()">Cadastrar</button>
+        <button onclick="handleShowRegisteredUsers()">Ver Usuários Registrados</button>
+        <button onclick="handleShowLoginForm()">Voltar ao Login</button>
+    </div>
+
+    <div id="registeredUsers" class="hidden">
+        <h2>Usuários Registrados</h2>
+        <div class="form-group">
+            <label for="adminPasswordView">Senha de Administrador:</label>
+            <input type="password" id="adminPasswordView" required>
+        </div>
+        <button onclick="checkAdminAndShowUsers()">Visualizar Usuários</button>
+        <div id="usersTableContainer" class="hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Senha</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="registeredUsersTableBody">
+                </tbody>
+            </table>
+        </div>
+        <button onclick="handleShowRegisterForm()">Voltar ao Cadastro</button>
+    </div>
+
+    <div id="userPanel" class="hidden">
+        <h2>Painel do Usuário</h2>
+        <div class="form-group">
+            <label for="adminPasswordManage">Senha de Administrador:</label>
+            <input type="password" id="adminPasswordManage" required>
+        </div>
+        <button onclick="checkAdminAndShowUserTable()">Gerenciar Usuários</button>
+        <button onclick="handleLogout()">Sair</button>
+        <a href="https://carlosferreira29.github.io/Cartonale/ target="_blank" id="accessLink" class="hidden">Acessar Link Especial</a>
+        
+        <div id="userTable" class="hidden">
+            <h3>Usuários Cadastrados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Senha</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="successMessage" class="hidden"></div>
+    <div id="errorMessage" class="hidden"></div>
+</div>
+
+<script>
+// Constantes e variáveis globais
+const ADMIN_PASSWORD = 'Zaq1Xsw2';
+let users = [];
+
+// Função para verificar se a string contém apenas letras
+function containsOnlyLetters(str) {
+    return /^[A-Za-z]+$/.test(str);
+}
+
+// Funções de utilidade
+function showMessage(message, isError = false) {
+    const successMsg = document.getElementById('successMessage');
+    const errorMsg = document.getElementById('errorMessage');
+    
+    if (isError) {
+        errorMsg.textContent = message;
+        errorMsg.classList.remove('hidden');
+        successMsg.classList.add('hidden');
+        setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+    } else {
+        successMsg.textContent = message;
+        successMsg.classList.remove('hidden');
+        errorMsg.classList.add('hidden');
+        setTimeout(() => successMsg.classList.add('hidden'), 3000);
+    }
+}
+
+function hideAllForms() {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('registerForm').classList.add('hidden');
+    document.getElementById('userPanel').classList.add('hidden');
+    document.getElementById('registeredUsers').classList.add('hidden');
+}
+
+function handleShowLoginForm() {
+    hideAllForms();
+    document.getElementById('loginForm').classList.remove('hidden');
+}
+
+function handleShowRegisterForm() {
+    hideAllForms();
+    document.getElementById('registerForm').classList.remove('hidden');
+}
+
+function handleShowUserPanel() {
+    hideAllForms();
+    document.getElementById('userPanel').classList.remove('hidden');
+    document.getElementById('accessLink').classList.remove('hidden');
+}
+
+function handleShowRegisteredUsers() {
+    hideAllForms();
+    document.getElementById('registeredUsers').classList.remove('hidden');
+    document.getElementById('usersTableContainer').classList.add('hidden');
+}
+
+function checkAdminAndShowUsers() {
+    const adminPasswordInput = document.getElementById('adminPasswordView');
+    if (adminPasswordInput.value === ADMIN_PASSWORD) {
+        document.getElementById('usersTableContainer').classList.remove('hidden');
+        updateRegisteredUsersTable();
+        showMessage('Usuários carregados com sucesso!');
+        adminPasswordInput.value = ''; // Clear admin password field
+    } else {
+        showMessage('Senha de administrador incorreta!', true);
+    }
+}
+
+function checkAdminAndShowUserTable() {
+    const adminPasswordInput = document.getElementById('adminPasswordManage');
+    if (adminPasswordInput.value === ADMIN_PASSWORD) {
+        document.getElementById('userTable').classList.remove('hidden');
+        handleShowUserTable();
+        showMessage('Gerenciamento de usuários liberado!');
+        adminPasswordInput.value = ''; // Clear admin password field
+    } else {
+        showMessage('Senha de administrador incorreta!', true);
+    }
+}
+
+function updateRegisteredUsersTable() {
+    const tableBody = document.getElementById('registeredUsersTableBody');
+    tableBody.innerHTML = '';
+    users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.username}</td>
+            <td class="password-column">${user.password}</td>
+            <td>
+                <button onclick="handleEditUser('${user.username}')">Editar</button>
+                <button onclick="handleDeleteUser('${user.username}')">Excluir</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function handleRegister() {
+    const newUsername = document.getElementById('newUsername').value;
+    const newPassword = document.getElementById('newPassword').value;
+
+    if (!newUsername || !newPassword) {
+        showMessage('Por favor, preencha todos os campos!', true);
+        return;
+    }
+
+    // Adicionando validação para letras apenas
+    if (!containsOnlyLetters(newUsername)) {
+        showMessage('O nome de usuário deve conter apenas letras!', true);
+        return;
+    }
+
+    if (users.some(user => user.username === newUsername)) {
+        showMessage('Usuário já existe!', true);
+        return;
+    }
+
+    users.push({username: newUsername, password: newPassword});
+    showMessage('Usuário cadastrado com sucesso!');
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    updateRegisteredUsersTable();
+}
+
+function handleLogin() {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    // Validate empty fields
+    if (!username || !password) {
+        showMessage('Por favor, preencha todos os campos!', true);
+        return;
+    }
+
+    // First check if the username exists in the registered users
+    const userExists = users.some(u => u.username === username);
+    if (!userExists) {
+        showMessage('Usuário não está registrado no sistema!', true);
+        return;
+    }
+
+    // Then check if the password matches for that user
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+        showMessage('Login realizado com sucesso!');
+        // Clear login fields after successful login
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+        
+        // Redirect to Google after successful login
+        window.location.href = 'https://www.google.com/';
+    } else {
+        showMessage('Senha incorreta!', true);
+    }
+}
+
+function handleLogout() {
+    handleShowLoginForm();
+    showMessage('Logout realizado com sucesso!');
+}
+
+function handleShowUserTable() {
+    const userTableBody = document.getElementById('userTableBody');
+    userTableBody.innerHTML = '';
+    users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.username}</td>
+            <td class="password-column">${user.password}</td>
+            <td>
+                <button onclick="handleEditUser('${user.username}')">Editar</button>
+                <button onclick="handleDeleteUser('${user.username}')">Excluir</button>
+            </td>
+        `;
+        userTableBody.appendChild(row);
+    });
+}
+
+function handleEditUser(username) {
+    const newPassword = prompt('Digite a nova senha:');
+    if (newPassword) {
+        const userIndex = users.findIndex(u => u.username === username);
+        if (userIndex !== -1) {
+            users[userIndex].password = newPassword;
+            showMessage('Senha alterada com sucesso!');
+            handleShowUserTable();
+            updateRegisteredUsersTable();
+        }
+    }
+}
+
+function handleDeleteUser(username) {
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        users = users.filter(u => u.username !== username);
+        showMessage('Usuário excluído com sucesso!');
+        handleShowUserTable();
+        updateRegisteredUsersTable();
+    }
+}
+
+function promptAdminPassword() {
+    const adminPass = prompt("Digite a senha de administrador:");
+    if (adminPass === ADMIN_PASSWORD) {
+        handleShowRegisterForm();
+        showMessage('Acesso ao cadastro liberado!');
+    } else {
+        showMessage('Senha de administrador incorreta!', true);
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    handleShowLoginForm();
+    
+    // Adicionando validação de entrada para o campo de nome de usuário
+    const newUsernameInput = document.getElementById('newUsername');
+    newUsernameInput.addEventListener('input', function(e) {
+        // Remove qualquer caractere que não seja letra imediatamente
+        this.value = this.value.replace(/[^A-Za-z]/g, '');
+    });
+});
+</script>
+</body>
+</html>
